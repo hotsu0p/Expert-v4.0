@@ -1,12 +1,79 @@
 <%- include("partials/header", { bot, user, path, title: "Home" }) %>
 
-<div class="container-sm center" style="margin-top: 25px;">
-  <div class="d-grid gap-2 col-6 mx-auto">
-    <h2>Welcome to chaotics dashboard!</h2>
-    <p>Not to much here for now.....</p>
-    <a class="btn btn-secondary text-white" href="/dashboard">Dashboard</a>
-    <a class="btn btn-primary text-white" href="https://github.com/hotsu0p/chaotic" target="_blank" rel="noopener noreferrer">GitHub</a>
-    <a class="btn btn-warning text-white" href="<%= discordInvite %>" target="_blank" rel="noopener noreferrer">Discord Server</a>
+<style>
+  body {
+    background-color: #282c37;
+    color: #ffffff;
+  }
+
+  .container-sm {
+    text-align: center;
+    margin-top: 5rem;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  .btn {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+    margin: 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background-color: #495057;
+    border-color: #495057;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+  }
+
+  .btn-warning:hover {
+    background-color: #d39e00;
+    border-color: #d39e00;
+  }
+</style>
+
+<div class="container-sm">
+  <h2>Welcome to Chaotic's Dashboard!</h2>
+  <p>Explore the features and settings below:</p>
+
+  <div class="row">
+    <div class="col-md-4">
+      <a href="/dashboard" class="btn btn-secondary btn-lg btn-block">Dashboard</a>
+    </div>
+    <div class="col-md-4">
+      <a href="https://github.com/hotsu0p/chaotic" class="btn btn-primary btn-lg btn-block" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+    <div class="col-md-4">
+      <a href="<%= discordInvite %>" class="btn btn-warning btn-lg btn-block" target="_blank" rel="noopener noreferrer">Discord Server</a>
+    </div>
   </div>
 </div>
 

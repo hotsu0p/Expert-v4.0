@@ -173,7 +173,26 @@ module.exports = async (client) => {
     renderTemplate(res, req, "dashboard.ejs", { perms: meow });
   });
   
+
+  app.get('/dashboard/:guildID/embed-builder', checkAuth, async (req, res) => {
+    try {
+      const guildID = req.params.guildID; // Corrected variable name
   
+      if (!guildID) {
+        console.error(`Guild with ID ${guildID} not found.`);
+        return res.status(404).send('Guild not found');
+      }
+  
+      renderTemplate(res,req ,'embed-builder.ejs', {
+        user: req.user || null,
+        bot: req.client,
+        guildID: guildID, 
+      });
+    } catch (error) {
+      console.error(`Error processing /dashboard/:guildID/embed-builder: ${error.message}`);
+      return res.status(500).send('Internal Server Error');
+    }
+  });
 
   app.get("/dashboard/:guildID", checkAuth, async (req, res) => {
     const guild = client.guilds.cache.get(req.params.guildID);
