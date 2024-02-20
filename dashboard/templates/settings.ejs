@@ -1,0 +1,55 @@
+<%- include("partials/header", { bot, user, path, title: `Settings | ${guild.name}` }) %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <% if (alert) { %>
+        <div class="alert alert-success" role="alert">
+          <%= alert %>
+        </div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h1 class="card-title mb-0"><%= guild.name %> Settings</h1>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Customize your bot settings for <%= guild.name %> below:</p>
+
+          <form method="POST">
+            <div class="mb-3">
+              <label for="prefix" class="form-label h5">Prefix:</label>
+              <p class="form-text text-muted">The prefix that is added to Discord messages to invoke commands.</p>
+              <input type="text" class="form-control" id="prefix" name="prefix" value="<%= settings.prefix %>" placeholder="Your prefix">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    background: linear-gradient(to right, #1c1c1d, #182848);
+    color: #ffffff;
+  }
+
+  .card {
+    margin-top: 20px;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+</style>
+
+<%- include("partials/footer") %>
