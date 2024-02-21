@@ -33,9 +33,96 @@
    iconurl = "https://cdn.glitch.com/82fe990a-7942-42e3-9790-39807ccdb9f6%2Ficon-404-dark.png?v=1602427904949";
   }
   %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Discord Channel</title>
+</head>
+<body>
+  <h1>Create New Channel</h1>
+  <form action="/create-channel" method="POST">
+    <label for="guild-id">Guild ID:</label>
+    <input type="text" id="guild-id" name="guild-id" required>
+    <br>
+    <label for="channel-name">Channel Name:</label>
+    <input type="text" id="channel-name" name="channel-name" required>
+    <br>
+    <button type="submit">Create Channel</button>
+  </form>
+</body>
+</html>
+
+<script>
+  // Optional: You can use JavaScript to add additional functionality
+  document.getElementById('createChannelForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    // Add any additional logic or AJAX request here if needed
+    this.submit(); // Submit the form
+  });
+</script>
   
+  <style>
+    body {
+      background: linear-gradient(to right, #2c3e50, #3498db);
+      color: #ffffff;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif; /* Change font family as needed */
+    }
   
+    .btn-primary {
+      background-color: #3498db;
+      border-color: #3498db;
+      font-weight: bold; /* Increase font weight for emphasis */
+    }
   
+    .btn-primary:hover {
+      background-color: #2980b9;
+      border-color: #2980b9;
+    }
+  
+    main {
+      position: relative;
+      z-index: 1;
+    }
+  
+    main::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(44, 62, 80, 0.8), rgba(52, 152, 219, 0.8));
+      z-index: -1;
+    }
+  
+    /* Adjust styling for the card and form for a different appearance */
+    .card {
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  
+    .card-header {
+      background-color: #3498db;
+      color: #ffffff;
+      border-bottom: none;
+    }
+  
+    .form-control {
+      background-color: #ecf0f1;
+      color: #2c3e50;
+    }
+  
+    .form-control:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.5);
+    }
+  </style>
   <link rel="stylesheet" href="https://cdn.lineicons.com/2.0/LineIcons.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@300;500&display=swap" rel="stylesheet">

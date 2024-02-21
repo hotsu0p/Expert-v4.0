@@ -59,6 +59,29 @@ client.once('ready', async () => {
     
   });
   // index.js
+  
+client.on('messageCreate', (message) => {
+  if (message.content.toLowerCase() === '!ticket') {
+    const channel = message.guild.channels.create('ticket', {
+      name: 'ticket',
+      type: 'text',
+      permissionOverwrites: [
+        {
+          id: message.guild.id,
+          deny: ['VIEW_CHANNEL'],
+        },
+        {
+          id: message.author.id,
+          allow: ['VIEW_CHANNEL'],
+        },
+      ],
+    });
+
+    channel.then((ticketChannel) => {
+      message.author.send(`Your ticket has been created in ${ticketChannel}`);
+    });
+  }
+});
 client.on('messageCreate', async (message) => {
   try {
     

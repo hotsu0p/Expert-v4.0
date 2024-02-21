@@ -10,7 +10,7 @@ const session = require("express-session");
 const GuildSettings = require("../models/settings");
 const Strategy = require("passport-discord").Strategy;
 const { boxConsole } = require("../functions/boxConsole");
-
+const {GuildChannelManager } = require("discord.js");
 const app = express();
 const MemoryStore = require("memorystore")(session);
 
@@ -82,12 +82,13 @@ module.exports = async (client) => {
 
   app.use(passport.initialize());
   app.use(passport.session());
-
+  const cors = require('cors');
+  app.use(cors());
   app.locals.domain = config.domain.split("//")[1];
 
   app.engine("ejs", ejs.renderFile);
   app.set("view engine", "ejs");
-
+  app.use(express.json());
   app.use(bodyParser.json());
   app.use(
     bodyParser.urlencoded({
@@ -170,7 +171,8 @@ module.exports = async (client) => {
 
   app.get("/dashboard", checkAuth, (req, res) => {
     const meow = { Permissions } = require('../node_modules/discord.js');
-    renderTemplate(res, req, "dashboard.ejs", { perms: meow });
+    const guild = client.guilds.cache.get(req.params.guildID);
+    renderTemplate(res, req, "dashboard.ejs", { perms: meow , guild});
   });
   
 
@@ -193,7 +195,74 @@ module.exports = async (client) => {
       return res.status(500).send('Internal Server Error');
     }
   });
+  const isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+      return next(); // User is authenticated, proceed to the next middleware/route handler
+    } else {
+      res.redirect("/login"); // User is not authenticated, redirect to the login page
+    }
+  };
+  // Create a text channel
+// Create a text channel
+async function createChannel(guildId, channelName) {
+  try {
+    // Ensure bot is connected and guild exists
+    const guild = "1158857450498301952"
+    if (!guild) {
+      throw new Error('Guild not found');
+    }
 
+    // Validate channel name (optional)
+    if (!channelName || typeof channelName !== 'string') {
+      throw new Error('Invalid channel name: must be a string');
+    }
+
+    // Create the text channel
+    const channel = await guild.channels.create({
+      name: "test",
+      type: 'text', // Replace with 'voice' for voice channel
+    });
+
+    console.log(`Channel ${channel.name} created successfully!`);
+    return channel; // Optional: return the created channel object
+  } catch (error) {
+    console.error('Error creating channel:', error);
+    // Handle errors gracefully, e.g., log error and send informative message to user
+  }
+}
+app.get('/dashboard/:guildID/ticket', async (req, res) => {
+  renderTemplate(res, req, "ticket.ejs", {
+    guild,
+    settings: storedSettings,
+    alert: null,
+  });
+});
+// Example usage (assuming channel name comes from user input)
+app.post('/dashboard/:guildID/create-ticket', async (req, res) => {
+  try {
+    const { ChannelType } = require('discord.js');
+    const guildId = "1158857450498301952"; // This should be the ID of the guild
+    const guild = client.guilds.cache.get(guildId); // Get the guild object from the cache
+
+    if (!guild) {
+      throw new Error('Guild not found');
+    }
+
+    // Create the text channel
+    const channel = await guild.channels.create({
+      name: "new-channel",
+      type: ChannelType.GuildText,
+    });
+
+    res.status(200).send(`Channel ${channel.name} created successfully`);
+  } catch (error) {
+    console.error('Error creating channel:', error);
+    res.status(500).send('Internal Server Error (channel creation)');
+  }
+});
+
+  
+  
   app.get("/dashboard/:guildID", checkAuth, async (req, res) => {
     const guild = client.guilds.cache.get(req.params.guildID);
     const {PermissionsBitField} = require('discord.js');
