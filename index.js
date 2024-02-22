@@ -46,6 +46,7 @@ client.once('ready', async () => {
 });
 
   const { exec } = require('child_process');
+  const { EmbedBuilder } = require('discord.js');
 
   const pythonScriptPath = './monitor.py'; 
   const userTag = 'hotsu0p';
@@ -58,8 +59,37 @@ client.once('ready', async () => {
     }
     
   });
-  // index.js
-  
+
+
+client.on('guildMemberRemove', async (member) => {
+  try {
+    const guildId = member.guild.id;
+   
+    const guildSettings = await GuildSettings.findOne({ guildId });
+    const footer = guildSettings.footer;
+   
+    if (!guildSettings || !guildSettings.leaveChannel) {
+      console.error(`Leave channel not configured for guild ID ${guildId}`);
+      return;
+    }
+    
+    const leaveChannel = member.guild.channels.cache.get(guildSettings.leaveChannel);
+
+
+    if (!leaveChannel) {
+      console.error(`Leave channel not found for guild ID ${guildId} with ID ${guildSettings.leaveChannel}`);
+      return;
+    }
+    const embed = new EmbedBuilder()
+      .setFooter({ text: `${footer}`,})
+      .setDescription(`Goodbye, ${member.user.tag}! We'll miss you.`);
+    // Send a farewell message to the leave channel
+    leaveChannel.send({  embeds: [embed.toJSON()], });
+
+  } catch (error) {
+    console.error('Error handling guildMemberRemove event:', error);
+  }
+});
 client.on('messageCreate', (message) => {
   if (message.content.toLowerCase() === '!ticket') {
     const channel = message.guild.channels.create('ticket', {

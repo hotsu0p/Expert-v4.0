@@ -17,7 +17,7 @@ const MemoryStore = require("memorystore")(session);
 module.exports = async (client) => {
   const dataDir = path.resolve(`${process.cwd()}${path.sep}dashboard`);
   const templateDir = path.resolve(`${dataDir}${path.sep}templates`);
-
+  app.use(express.urlencoded({ extended: true }));
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((obj, done) => done(null, obj));
 
@@ -160,15 +160,6 @@ module.exports = async (client) => {
       discordInvite: config.discordInvite,
     });
   });
-
-
-
-
-
- 
-
- 
-
   app.get("/dashboard", checkAuth, (req, res) => {
     const meow = { Permissions } = require('../node_modules/discord.js');
     const guild = client.guilds.cache.get(req.params.guildID);
@@ -202,66 +193,152 @@ module.exports = async (client) => {
       res.redirect("/login"); // User is not authenticated, redirect to the login page
     }
   };
-  // Create a text channel
-// Create a text channel
-async function createChannel(guildId, channelName) {
-  try {
-    // Ensure bot is connected and guild exists
-    const guild = "1158857450498301952"
-    if (!guild) {
-      throw new Error('Guild not found');
-    }
+  const TicketSettings = require('../models/TicketSettings');
 
-    // Validate channel name (optional)
-    if (!channelName || typeof channelName !== 'string') {
-      throw new Error('Invalid channel name: must be a string');
-    }
-
-    // Create the text channel
-    const channel = await guild.channels.create({
-      name: "test",
-      type: 'text', // Replace with 'voice' for voice channel
-    });
-
-    console.log(`Channel ${channel.name} created successfully!`);
-    return channel; // Optional: return the created channel object
-  } catch (error) {
-    console.error('Error creating channel:', error);
-    // Handle errors gracefully, e.g., log error and send informative message to user
-  }
-}
-app.get('/dashboard/:guildID/ticket', async (req, res) => {
-  renderTemplate(res, req, "ticket.ejs", {
-    guild,
-    settings: storedSettings,
-    alert: null,
-  });
-});
-// Example usage (assuming channel name comes from user input)
-app.post('/dashboard/:guildID/create-ticket', async (req, res) => {
-  try {
-    const { ChannelType } = require('discord.js');
-    const guildId = "1158857450498301952"; // This should be the ID of the guild
-    const guild = client.guilds.cache.get(guildId); // Get the guild object from the cache
-
-    if (!guild) {
-      throw new Error('Guild not found');
-    }
-
-    // Create the text channel
-    const channel = await guild.channels.create({
-      name: "new-channel",
-      type: ChannelType.GuildText,
-    });
-
-    res.status(200).send(`Channel ${channel.name} created successfully`);
-  } catch (error) {
-    console.error('Error creating channel:', error);
-    res.status(500).send('Internal Server Error (channel creation)');
-  }
-});
-
+  // Middleware to check authentication
   
+  // Route handler to render the ticket page
+  app.get("/dashboard/:guildID/ticket", isAuthenticated, async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      renderTemplate(res, req, "ticket.ejs", {
+        guild: client.guilds.cache.get(guildId),
+        ticketSettings: storedTicketSettings,
+        alert: null,
+      });
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  });
+  app.get("/meow", async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      renderTemplate(res, req, "t.ejs", {
+        guild: client.guilds.cache.get(guildId),
+        ticketSettings: storedTicketSettings,
+        alert: null,
+      });
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  });
+  // Example route to set the leave channel
+// Example route to set the leave channel
+app.post('/dashboard/:guildID/set-leave-channel', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { leaveChannelId } = req.body;
+
+    // Update or create guild settings
+    const result = await GuildSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { leaveChannel: leaveChannelId } },
+      { upsert: true, new: true, strict: false }
+    );
+
+    res.status(200).send('Leave channel set successfully');
+  } catch (error) {
+    console.error('Error setting leave channel:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+app.post('/dashboard/:guildID/set-footer', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { footer } = req.body;
+
+    // Update or create guild settings
+    const result = await GuildSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { footer: footer } },
+      { upsert: true, new: true, strict: false }
+    );
+
+    res.status(200).send('Leave channel set successfully');
+  } catch (error) {
+    console.error('Error setting leave channel:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+  // Route handler to create a ticket
+  app.post('/dashboard/:guildID/create-ticket', async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      if (!storedTicketSettings) {
+        console.error(`Ticket settings not found for guild ID ${guildId}`);
+        res.status(400).send('Ticket settings not found');
+        return;
+      }
+  
+      const guild = client.guilds.cache.get(guildId);
+  
+      if (!guild) {
+        console.error(`Guild not found for ID ${guildId}`);
+        res.status(400).send('Guild not found');
+        return;
+      }
+  
+      // Check if the ticket category is configured
+      if (!storedTicketSettings.ticketCategory) {
+        console.error(`Ticket category not configured for guild ID ${guildId}`);
+        res.status(400).send('Ticket category not configured');
+        return;
+      }
+  
+      // Create the channel under the specified category
+      if (!category) {
+        console.error(
+          `Category not found for guild ID ${guildId} with name ${storedTicketSettings.ticketCategory}`
+        );
+        res.status(500).send('Internal Server Error (category not found)');
+        return;
+      }
+      const { ChannelType } = require('discord.js');
+      // Assuming you want to create a text channel
+      const channel = await guild.channels.create({
+        name: "'new-ticket'",
+        type: ChannelType.GuildText,
+        parent: category,
+      });
+  
+      res.status(200).send(`Channel ${channel.name} created successfully`);
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      res.status(500).send('Internal Server Error (ticket creation)');
+    }
+  });
+  // Route handler to update the ticket category
+  app.post('/dashboard/:guildID/update-ticket-category', async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const { ticketCategory } = req.body;
+  
+      console.log('Guild ID:', guildId);
+      console.log('Ticket Category:', ticketCategory);
+  
+      // Update the ticket category in the database (assuming TicketSettings model)
+      const storedTicketSettings = await TicketSettings.findOneAndUpdate(
+        { guildId },
+        { $set: { ticketCategory } },
+        { new: true, upsert: true }
+      );
+  
+      res.status(200).send('Ticket category updated successfully');
+    } catch (error) {
+      console.error('Error handling POST request:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
   
   app.get("/dashboard/:guildID", checkAuth, async (req, res) => {
     const guild = client.guilds.cache.get(req.params.guildID);
