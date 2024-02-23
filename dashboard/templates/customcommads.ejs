@@ -1,0 +1,27 @@
+<!-- test2.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Ticket Settings</title>
+</head>
+<body>
+    <h1>Update Ticket Settings</h1>
+    
+    <form action="/dashboard/<%= guildID %>/update_command" method="post">
+        <label for="trigger">Command Trigger:</label>
+        <input type="text" id="trigger" name="trigger" required>
+
+        <label for="content">Ticket Category:</label>
+        <input type="text" id="content" name="content" required>
+
+        <button type="submit">Update Ticket Settings</button>
+    </form>
+
+    <% if (message) { %>
+        <p><%= message %></p>
+    <% } %>
+</body>
+</html>

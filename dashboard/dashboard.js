@@ -109,7 +109,47 @@ module.exports = async (client) => {
       Object.assign(baseData, data),
     );
   };
-
+  const mongoose = require('mongoose');
+  const { MongoClient, ServerApiVersion } = require('mongodb');
+  const EmbedSchema = new mongoose.Schema({
+    title: String,
+    description: String,
+    color: String,
+    imageUrl: String,
+  });
+  
+  const Embed = mongoose.model('Embed', EmbedSchema);
+  
+  app.post('/create-embed', async (req, res) => {
+    try {
+      const { title, description, color, imageUrl } = req.body;
+  
+      const embed = new Embed({
+        title,
+        description,
+        color,
+        imageUrl,
+      });
+  
+      await embed.save();
+  
+      // Generate Discord embed object (using Discord.js for illustration)
+      const discordEmbed = {
+        title: embed.title,
+        description: embed.description,
+        color: embed.color,
+        image: embed.imageUrl ? { url: embed.imageUrl } : undefined,
+      };
+  
+      // Send embed to Discord (replace with your actual logic)
+      // YourDiscordClient.channels.cache.get('your_channel_id').send({ embeds: [discordEmbed] });
+  
+      res.status(200).json({ message: 'Embed created and saved successfully!', embedData: discordEmbed });
+    } catch (error) {
+      console.error('Error creating embed:', error);
+      res.status(500).json({ message: 'Error creating embed' });
+    }
+  });
   const checkAuth = (req, res, next) => {
     if (req.isAuthenticated()) return next();
     req.session.backURL = req.url;
@@ -195,15 +235,13 @@ module.exports = async (client) => {
   };
   const TicketSettings = require('../models/TicketSettings');
 
-  // Middleware to check authentication
-  
-  // Route handler to render the ticket page
-  app.get("/dashboard/:guildID/ticket", isAuthenticated, async (req, res) => {
+
+  app.get("/dashboard/:guildID/customcommads", isAuthenticated, async (req, res) => {
     try {
       const guildId = req.params.guildID;
-      const storedTicketSettings = await TicketSettings.findOne({ guildId });
-  
-      renderTemplate(res, req, "ticket.ejs", {
+      renderTemplate(res, req, "customcommads.ejs", {
+        guildID: guildId,
+        message: null ,
         guild: client.guilds.cache.get(guildId),
         ticketSettings: storedTicketSettings,
         alert: null,
@@ -228,8 +266,13 @@ module.exports = async (client) => {
       res.status(500).send('Internal Server Error (ticket settings retrieval)');
     }
   });
-  // Example route to set the leave channel
-// Example route to set the leave channel
+  app.post('/submit-data', (req, res) => {
+    const { name, email, message } = req.body; 
+  
+    console.log(name, email, message);
+  
+    res.send('Data received successfully!');
+  });
 app.post('/dashboard/:guildID/set-leave-channel', async (req, res) => {
   try {
     const guildId = req.params.guildID;
@@ -339,9 +382,51 @@ app.post('/dashboard/:guildID/set-footer', async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
-  
+
+app.post('/dashboard/:guildID/update_command', async (req, res) => {
+  try {
+      const guildId = req.params.guildID;
+      const { trigger, content } = req.body;
+      console.log('Received Body:', req.body);
+      console.log('Guild ID:', guildId);
+      console.log('Trigger:', trigger);
+      console.log('Content:', content);
+
+      
+      // Update or insert data into MongoDB
+      const result = await custom_commandsModel.findOneAndUpdate(
+          { guildId },
+          { $set: { trigger, content } },
+          { upsert: true, new: true } // Upsert creates a new document if it doesn't exist
+      );
+
+      console.log('Result:', result);
+      res.status(200).send('Ticket category updated successfully');
+
+  } catch (error) {
+      console.error('Error handling POST request:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
   app.get("/dashboard/:guildID", checkAuth, async (req, res) => {
     const guild = client.guilds.cache.get(req.params.guildID);
+    const join1 = [];
+    const join2 = [];
+    guild.members.cache.forEach(async (user) => {
+      let x = Date.now() - user.joinedAt;
+      let created = Math.floor(x / 86400000);
+
+      if (7 > created) {
+        join2.push(user.id);
+      }
+
+      if (1 > created) {
+        join1.push(user.id);
+      }
+    });
+    const now = Date.now();
+
+   const olderJoins = join1.filter((userId) => now - message.guild.members.cache.get(userId).joinedAt <= 86400000);
     const {PermissionsBitField} = require('discord.js');
     if (!guild) return res.redirect("/dashboard");
     let member = guild.members.cache.get(req.user.id);
@@ -373,6 +458,8 @@ app.post('/dashboard/:guildID/set-footer', async (req, res) => {
       guild,
       settings: storedSettings,
       alert: null,
+      join1: join1.length || 0,
+      join2: join2.length || 0,
     });
   });
 

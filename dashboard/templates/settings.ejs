@@ -5,25 +5,25 @@
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> 
   
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
   
     <link rel="stylesheet" href="<%=domain%>/css/members.css">
   
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js" integrity="sha256-zG8v+NWiZxmjNi+CvUYnZwKtHzFtdO8cAKUIdB8+U9I=" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/v/bs4/dt-1.10.16/cr-1.4.1/r-2.2.0/datatables.min.js"></script>
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
   <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css'>
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> 
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Raleway'>
   <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
   </head>
   
   <% if (guild.icon) {
@@ -97,7 +97,8 @@
   <link rel="stylesheet" href="https://cdn.lineicons.com/2.0/LineIcons.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@300;500&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
   <div class="container" style="padding-top: 80px;">
     <div class="main">
       <div class="sidebar">
@@ -109,41 +110,52 @@
           <p>Settings</p>
           <li><a href="/dashboard/<%= guild.id %>"><span><i class="fa fa-gear" style="color: white; font-size: 17px"></i> Bot Settings</span></a></li>
           <li><a href="/dashboard/<%= guild.id %>/embed-builder" ><span><i class="	fa fa-image" style="color: white; font-size: 17px"></i> Embeds</span></a></li>
+          <li><a href="/dashboard/<%= guild.id %>/customcommads" ><span><i class="	glyphicon glyphicon-cloud" style="color: white; font-size: 17px"></i> Custom commads</span></a></li>
         </ul>
       </div>
-  <div class="mb-3">
-    <label for="prefix" class="form-label h5">Prefix:</label>
-    <p class="form-text text-muted">The prefix that is added to Discord messages to invoke commands.</p>
-    <input type="text" class="form-control" id="prefix" name="prefix" value="<%= settings.prefix %>" placeholder="Your prefix">
-  </div>
+      
+  
   <div>
-<!-- Leave Channel Settings Form -->
-<h2>Leave Channel Settings</h2>
-<form action="/dashboard/<%= guild.id %>/set-leave-channel" method="post" oninput="updateEmbedPreview()">
-    <label for="leaveChannelId">Leave Channel ID:</label>
-    <input type="text" id="leaveChannelId" name="leaveChannelId" placeholder="Enter Channel ID" required>
-    <small>Provide the channel ID where leave messages will be sent.</small>
-    <button type="submit">Set Leave Channel</button>
-</form>
-
-<!-- Footer Settings Form -->
-<h2>Footer Settings</h2>
-<form action="/dashboard/<%= guild.id %>/set-footer" method="post" oninput="updateEmbedPreview()">
-    <label for="footerText">Footer Text:</label>
-    <input type="text" id="footerText" name="footerText" placeholder="Enter Footer Text" required>
-    <small>This text will be displayed in the footer of embeds.</small>
-    <button type="submit">Set Footer</button>
-</form>
+    <h2>Leave Channel Settings</h2>
+    <form action="/dashboard/<%= guild.id %>/set-leave-channel" method="post" oninput="updateEmbedPreview()">
+        <label for="leaveChannelId">Leave Channel ID:</label>
+        <input type="text" id="leaveChannelId" name="leaveChannelId" class="form-control" placeholder="Enter Channel ID" required>
+        <small>Provide the channel ID where leave messages will be sent.</small>
+        <button type="submit">Set Leave Channel</button>
+    </form>
+    <h2>Footer Settings</h2>
+    <form action="/dashboard/<%= guild.id %>/set-footer" method="post" oninput="updateEmbedPreview()">
+        <label for="footerText">Footer Text:</label>
+        <input type="text" id="footerText" name="footerText" class="form-control" placeholder="Enter Footer Text" required>
+        <small>This text will be displayed in the footer of embeds.</small>
+        <button type="submit">Set Footer</button>
+    </form>
+    <div class="mb-3">
+      <label for="prefix" class="form-label h5">Prefix:</label>
+      <p class="form-text text-muted">The prefix that is added to Discord messages to invoke commands.</p>
+      <input type="text" class="form-control" id="prefix" name="prefix" value="<%= settings.prefix %>" placeholder="Your prefix">
+    </div>
+    <div class="server-activity">
+      <h2>Server Activity</h2>
+      <p>Joins today</p>
+      <ul>
+   <%= join1 %>
+      </ul>
+      <p>Recent Leaves:</p>
+      <ul>
+        
+      </ul>
+    </div>
 </div>
 
-  <button type="submit" class="btn btn-primary">Save Settings</button>
-  
+
+<button type="submit" class="btn btn-primary">Save Settings</button>
 </select>
     </div>
   </div>
   
-  
-  
+
+
   
   </div>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
@@ -152,6 +164,50 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/wow/0.1.12/wow.min.js'></script>
   
   <style>
+    
+    .btn-primary{
+      width: 112px;
+      height: 50px;
+    }
+    input[type="text"],
+  input[type="password"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"],
+  select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 5; /* Added margin to create space between controls */
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="submit"]:focus,
+  input[type="button"]:focus,
+  input[type="reset"]:focus,
+  select:focus {
+    border-color: #3498db; /* Highlight border color on focus */
+  }
+
+  /* Additional styling for specific inputs */
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"] {
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  input[type="submit"]:hover,
+  input[type="button"]:hover,
+  input[type="reset"]:hover {
+    background-color: #2980b9;
+  }
   * {
     margin: 0;
     padding: 0;

@@ -2,7 +2,7 @@
 
 <style>
   body {
-    background-color: #282c37;
+    background: linear-gradient(to right, #1c1c1d, #0e131d);
     color: #ffffff;
   }
 
@@ -62,23 +62,56 @@
     background-color: #d39e00;
     border-color: #d39e00;
   }
+  .button {
+  background-color: #323232;
+  border: none;
+  color: white;
+  padding: 13px 30px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: .5s;
+  font-size: 13px;
+}
+.button:hover {
+  background-color: #363938;
+  color: #000000;
+  transform: translateY(2px);
+  transform: translateX(1px);
+}
 </style>
-
+<div class="glow"></div>
+<style>
+  .glow {
+    width: 80%;
+    height: 60px;
+    background: linear-gradient(90deg, #dd4949, #5e40e4);
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    border-radius: 50%;
+    transform: translateY(-20%);
+    filter: blur(160px);
+  }
+</style>
 <div class="container-sm">
   <h2>Welcome to Chaotic's Dashboard!</h2>
   <p>Explore the features and settings below:</p>
 
   <div class="row">
     <div class="col-md-4">
-      <a href="/dashboard" class="btn btn-secondary btn-lg btn-block">Dashboard</a>
+      <a class='button btn btn-default' href='/dashboard'><span><i class="fa fa-bar-chart" aria-hidden="true"></i> Dashboard</span></a>
     </div>
     <div class="col-md-4">
-      <a href="https://github.com/hotsu0p/chaotic" class="btn btn-primary btn-lg btn-block" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
-    <div class="col-md-4">
-      <a href="<%= discordInvite %>" class="btn btn-warning btn-lg btn-block" target="_blank" rel="noopener noreferrer">Discord Server</a>
-    </div>
+  </div>
+ 
+</div>
+<div>
+  <div>
+      <div>
+        You can configure the bot prefix for your server in the dashboard! and more soon!
+      </div>
   </div>
 </div>
-
 <%- include("partials/footer") %>
