@@ -78,7 +78,6 @@ client.on('messageCreate', async message => {
       message.reply('There was an error executing the command!');
   }
 });
-});
 
   const { exec } = require('child_process');
   const { EmbedBuilder } = require('discord.js');
