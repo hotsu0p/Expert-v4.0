@@ -38,13 +38,14 @@ class CommandHandler {
           if (!message.content.startsWith(this.prefix) || message.author.bot) return;
       
           const args = message.content.slice(this.prefix.length).trim().split(/ +/);
+          const guild = message.guild.id
           const commandName = args.shift().toLowerCase();
       
           const command = this.commands.get(commandName) || this.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
       
           if (command) {
             console.log(`Command found: ${command.name}`); // Add this line
-            command.execute(message, args);
+            command.execute(message, args, guild);
           } else {
             console.log(`Command not found: ${commandName}`); // Add this line
           }

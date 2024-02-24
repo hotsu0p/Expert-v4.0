@@ -45,39 +45,7 @@ client.once('ready', async () => {
   }
 });
 const CustomCommandModel = require('./models/CustomCommands');
-client.on('messageCreate', async message => {
-  if (message.author.bot || !message.guild) return;
 
-  const { content, guild, member } = message;
-  const [commandName, ...args] = content.slice(prefix.length).trim().split(/ +/);
-
-  if (!content.startsWith(prefix)) return;
-
-  try {
-      // Check if the command exists in the custom commands
-      const customCommand = await CustomCommandModel.findOne({
-          guildId: guild.id,
-          $or: [
-              { trigger: commandName.toLowerCase() },
-              { aliases: commandName.toLowerCase() },
-          ],
-      });
-
-      if (customCommand) {
-          const response = await executeCustomCommand(customCommand, args, member);
-          message.channel.send(response);
-          return;
-      }
-
-      const command = client.commands.get(commandName.toLowerCase());
-      if (!command) return;
-
-      command.execute(message, args);
-  } catch (error) {
-      console.error('Error handling messageCreate event:', error);
-      message.reply('There was an error executing the command!');
-  }
-});
 
   const { exec } = require('child_process');
   const { EmbedBuilder } = require('discord.js');
@@ -165,6 +133,7 @@ client.on('messageCreate', async (message) => {
     if (!message.content.startsWith(storedSettings.prefix)) return;
 
     const args = message.content.slice(storedSettings.prefix.length).trim().split(/ +/g);
+    const guild = message.guild
     const commandName = args.shift().toLowerCase();
     
     let command = client.commands.get(commandName);
@@ -182,7 +151,7 @@ client.on('messageCreate', async (message) => {
     if (command) {
 
       if (typeof command.execute === 'function') {
-        command.execute(message, args);
+        command.execute(message, args, guild);
       } else {
         console.error(`Command ${command.name} is missing the execute method.`);
       }
@@ -191,8 +160,6 @@ client.on('messageCreate', async (message) => {
     console.error('Error during message event:', error);
   }
 });
-
-  
 
 client.on('error', console.error);
 client.on('warn', console.warn);
