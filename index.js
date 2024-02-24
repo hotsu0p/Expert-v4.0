@@ -44,8 +44,6 @@ client.once('ready', async () => {
     console.error('Error during client ready:', error);
   }
 });
-const CustomCommandModel = require('./models/CustomCommands');
-
 
   const { exec } = require('child_process');
   const { EmbedBuilder } = require('discord.js');
@@ -61,7 +59,22 @@ const CustomCommandModel = require('./models/CustomCommands');
     }
     
   });
+  const customCommandsModel = require('./models/CustomCommands');
 
+  client.on('messageCreate', async (message) => {
+      if (message.guild) {
+          const guildId = message.guild.id;
+          const messageContent = message.content;
+  
+          const command = await customCommandsModel.findOne({ guildId, trigger: messageContent });
+  
+          if (command) {
+              message.channel.send(command.content);
+          } else {
+            return;
+          }
+      }
+  });
 
 client.on('guildMemberRemove', async (member) => {
   try {
@@ -160,6 +173,21 @@ client.on('messageCreate', async (message) => {
     console.error('Error during message event:', error);
   }
 });
+const prefix = '!'; // Change this to your desired command prefix
+
+client.on('messageCreate', async (message) => {
+  if (message.content === '!ticket') {
+      const { ChannelType } = require('discord.js');
+      const guild = message.guild;
+      guild.channels.create({
+        name: "hello",
+        type: ChannelType.GuildText,
+
+    });
+      console.log("works")
+  }
+});
+
 
 client.on('error', console.error);
 client.on('warn', console.warn);
