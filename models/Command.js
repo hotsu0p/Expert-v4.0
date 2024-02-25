@@ -9,7 +9,7 @@ class Command {
       this.cooldown = options.cooldown || 3;
     }
   
-    execute(message, args) {
+    execute(message, args, guild) {
       throw new Error('execute() not implemented for this command.');
     }
   }

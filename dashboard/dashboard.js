@@ -10,14 +10,14 @@ const session = require("express-session");
 const GuildSettings = require("../models/settings");
 const Strategy = require("passport-discord").Strategy;
 const { boxConsole } = require("../functions/boxConsole");
-
+const {GuildChannelManager } = require("discord.js");
 const app = express();
 const MemoryStore = require("memorystore")(session);
 
 module.exports = async (client) => {
   const dataDir = path.resolve(`${process.cwd()}${path.sep}dashboard`);
   const templateDir = path.resolve(`${dataDir}${path.sep}templates`);
-
+  app.use(express.urlencoded({ extended: true }));
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((obj, done) => done(null, obj));
 
@@ -82,12 +82,13 @@ module.exports = async (client) => {
 
   app.use(passport.initialize());
   app.use(passport.session());
-
+  const cors = require('cors');
+  app.use(cors());
   app.locals.domain = config.domain.split("//")[1];
 
   app.engine("ejs", ejs.renderFile);
   app.set("view engine", "ejs");
-
+  app.use(express.json());
   app.use(bodyParser.json());
   app.use(
     bodyParser.urlencoded({
@@ -108,7 +109,47 @@ module.exports = async (client) => {
       Object.assign(baseData, data),
     );
   };
-
+  const mongoose = require('mongoose');
+  const { MongoClient, ServerApiVersion } = require('mongodb');
+  const EmbedSchema = new mongoose.Schema({
+    title: String,
+    description: String,
+    color: String,
+    imageUrl: String,
+  });
+  
+  const Embed = mongoose.model('Embed', EmbedSchema);
+  
+  app.post('/create-embed', async (req, res) => {
+    try {
+      const { title, description, color, imageUrl } = req.body;
+  
+      const embed = new Embed({
+        title,
+        description,
+        color,
+        imageUrl,
+      });
+  
+      await embed.save();
+  
+      // Generate Discord embed object (using Discord.js for illustration)
+      const discordEmbed = {
+        title: embed.title,
+        description: embed.description,
+        color: embed.color,
+        image: embed.imageUrl ? { url: embed.imageUrl } : undefined,
+      };
+  
+      // Send embed to Discord (replace with your actual logic)
+      // YourDiscordClient.channels.cache.get('your_channel_id').send({ embeds: [discordEmbed] });
+  
+      res.status(200).json({ message: 'Embed created and saved successfully!', embedData: discordEmbed });
+    } catch (error) {
+      console.error('Error creating embed:', error);
+      res.status(500).json({ message: 'Error creating embed' });
+    }
+  });
   const checkAuth = (req, res, next) => {
     if (req.isAuthenticated()) return next();
     req.session.backURL = req.url;
@@ -159,18 +200,10 @@ module.exports = async (client) => {
       discordInvite: config.discordInvite,
     });
   });
-
-
-
-
-
- 
-
- 
-
   app.get("/dashboard", checkAuth, (req, res) => {
     const meow = { Permissions } = require('../node_modules/discord.js');
-    renderTemplate(res, req, "dashboard.ejs", { perms: meow });
+    const guild = client.guilds.cache.get(req.params.guildID);
+    renderTemplate(res, req, "dashboard.ejs", { perms: meow , guild});
   });
   
 
@@ -193,9 +226,255 @@ module.exports = async (client) => {
       return res.status(500).send('Internal Server Error');
     }
   });
+  const isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+      return next(); // User is authenticated, proceed to the next middleware/route handler
+    } else {
+      res.redirect("/login"); // User is not authenticated, redirect to the login page
+    }
+  };
 
+  
+  app.get("/dashboard/:guildID/customcommads", isAuthenticated, async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      renderTemplate(res, req, "customcommads.ejs", {
+        guildID: guildId,
+        message: null ,
+        guild: client.guilds.cache.get(guildId),
+        alert: null,
+      });
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  });
+  const TicketSettings = require('../models/ticketModel'); // Assuming you have a TicketSettings model
+
+  app.get('/dashboard/:guildID/ticket', async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      // Check if the guild exists
+      const guild = client.guilds.cache.get(guildId);
+      if (!guild) {
+        console.error(`Guild with ID ${guildId} not found.`);
+        return res.status(404).send('Guild not found');
+      }
+  
+      // Render the template with necessary data
+      renderTemplate(res, req, 'ticket', {
+        guild,
+        ticketSettings: storedTicketSettings,
+        alert: null,
+      });
+      console.log(storedTicketSettings);
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  });
+  
+
+app.post('/dashboard/:guildID/update-ticket-settings', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { categoryId, otherSettings } = req.body;
+
+    console.log('Guild ID:', guildId);
+    console.log('Other Settings:', categoryId);
+
+    // Update the ticket settings in the database (assuming TicketSettings model)
+    const storedTicketSettings = await TicketSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { categoryId, otherSettings } },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).send('Ticket settings updated successfully');
+  } catch (error) {
+    console.error('Error handling POST request:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+/*   app.get("/dashboard/:guildID/ticket", async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      renderTemplate(res, req, "ticket.ejs", {
+        guild: client.guilds.cache.get(guildId),
+        ticketSettings: storedTicketSettings,
+        alert: null,
+      });
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  }); */
+  app.post('/submit-data', (req, res) => {
+    const { name, email, message } = req.body; 
+  
+    console.log(name, email, message);
+  
+    res.send('Data received successfully!');
+  });
+app.post('/dashboard/:guildID/set-leave-channel', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { leaveChannelId } = req.body;
+
+    // Update or create guild settings
+    const result = await GuildSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { leaveChannel: leaveChannelId } },
+      { upsert: true, new: true, strict: false }
+    );
+
+    res.status(200).send('Leave channel set successfully');
+  } catch (error) {
+    console.error('Error setting leave channel:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+app.post('/dashboard/:guildID/set-footer', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { footer } = req.body;
+
+    // Update or create guild settings
+    const result = await GuildSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { footer: footer } },
+      { upsert: true, new: true, strict: false }
+    );
+
+    res.status(200).send('Leave channel set successfully');
+  } catch (error) {
+    console.error('Error setting leave channel:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+  // Route handler to create a ticket
+  app.post('/dashboard/:guildID/create-ticket', async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      if (!storedTicketSettings) {
+        console.error(`Ticket settings not found for guild ID ${guildId}`);
+        res.status(400).send('Ticket settings not found');
+        return;
+      }
+  
+      const guild = client.guilds.cache.get(guildId);
+  
+      if (!guild) {
+        console.error(`Guild not found for ID ${guildId}`);
+        res.status(400).send('Guild not found');
+        return;
+      }
+  
+      // Check if the ticket category is configured
+      if (!storedTicketSettings.ticketCategory) {
+        console.error(`Ticket category not configured for guild ID ${guildId}`);
+        res.status(400).send('Ticket category not configured');
+        return;
+      }
+  
+      // Create the channel under the specified category
+      if (!category) {
+        console.error(
+          `Category not found for guild ID ${guildId} with name ${storedTicketSettings.ticketCategory}`
+        );
+        res.status(500).send('Internal Server Error (category not found)');
+        return;
+      }
+      const { ChannelType } = require('discord.js');
+      // Assuming you want to create a text channel
+      const channel = await guild.channels.create({
+        name: "'new-ticket'",
+        type: ChannelType.GuildText,
+        parent: category,
+      });
+  
+      res.status(200).send(`Channel ${channel.name} created successfully`);
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      res.status(500).send('Internal Server Error (ticket creation)');
+    }
+  });
+  // Route handler to update the ticket category
+  app.post('/dashboard/:guildID/update-ticket-category', async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const { ticketCategory } = req.body;
+  
+      console.log('Guild ID:', guildId);
+      console.log('Ticket Category:', ticketCategory);
+  
+      // Update the ticket category in the database (assuming TicketSettings model)
+      const storedTicketSettings = await TicketSettings.findOneAndUpdate(
+        { guildId },
+        { $set: { ticketCategory } },
+        { new: true, upsert: true }
+      );
+  
+      res.status(200).send('Ticket category updated successfully');
+    } catch (error) {
+      console.error('Error handling POST request:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+const custom_commandsModel = require('../models/CustomCommands');
+app.post('/dashboard/:guildID/update_command', async (req, res) => {
+  try {
+      const guildId = req.params.guildID;
+      const { trigger, content } = req.body;
+      console.log('Received Body:', req.body);
+      console.log('Guild ID:', guildId);
+      console.log('Trigger:', trigger);
+      console.log('Content:', content);
+
+      
+      // Update or insert data into MongoDB
+      const result = await custom_commandsModel.findOneAndUpdate(
+          { guildId },
+          { $set: { trigger, content } },
+          { upsert: true, new: true } // Upsert creates a new document if it doesn't exist
+      );
+
+      console.log('Result:', result);
+      res.status(200).send('Ticket category updated successfully');
+
+  } catch (error) {
+      console.error('Error handling POST request:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
   app.get("/dashboard/:guildID", checkAuth, async (req, res) => {
     const guild = client.guilds.cache.get(req.params.guildID);
+    const join1 = [];
+    const join2 = [];
+    guild.members.cache.forEach(async (user) => {
+      let x = Date.now() - user.joinedAt;
+      let created = Math.floor(x / 86400000);
+
+      if (7 > created) {
+        join2.push(user.id);
+      }
+
+      if (1 > created) {
+        join1.push(user.id);
+      }
+    });
+    const now = Date.now();
+
+   const olderJoins = join1.filter((userId) => now - message.guild.members.cache.get(userId).joinedAt <= 86400000);
     const {PermissionsBitField} = require('discord.js');
     if (!guild) return res.redirect("/dashboard");
     let member = guild.members.cache.get(req.user.id);
@@ -227,6 +506,8 @@ module.exports = async (client) => {
       guild,
       settings: storedSettings,
       alert: null,
+      join1: join1.length || 0,
+      join2: join2.length || 0,
     });
   });
 

@@ -2,8 +2,9 @@
 
 <style>
   body {
-    background-color: #282c37;
+    background: linear-gradient(to right, #1c1c1d, #0e131d);
     color: #ffffff;
+    font-family: "Arial", sans-serif;
   }
 
   .container-sm {
@@ -12,26 +13,30 @@
   }
 
   h2 {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 2rem;
+    color: #61dafb; /* Change color to a nice accent color */
   }
 
   p {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     margin-bottom: 3rem;
   }
 
   .btn {
-    font-size: 1.2rem;
-    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    padding: 1.5rem 3rem;
     margin: 1rem;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
     transition: background-color 0.3s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
   }
 
   .btn-secondary {
     background-color: #6c757d;
     border-color: #6c757d;
+    color: #ffffff;
   }
 
   .btn-secondary:hover {
@@ -42,6 +47,7 @@
   .btn-primary {
     background-color: #007bff;
     border-color: #007bff;
+    color: #ffffff;
   }
 
   .btn-primary:hover {
@@ -52,29 +58,77 @@
   .btn-warning {
     background-color: #ffc107;
     border-color: #ffc107;
+    color: #000000;
   }
 
   .btn-warning:hover {
     background-color: #d39e00;
     border-color: #d39e00;
   }
+
+  .sigma {
+    background-color: #323232;
+    border: none;
+    color: white;
+    padding: 13px 30px;
+    text-align: center;
+    text-decoration: none;
+    margin-right: -585px;
+    align-self: center;
+    align-items: center;
+    display: inline-block;
+    transition: 0.5s;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .sigma:hover {
+    background-color: #363938;
+    color: #000000;
+    transform: translateY(2px);
+  }
+
+  .glow {
+    width: 80%;
+    height: 60px;
+    background: linear-gradient(90deg, #dd4949, #5e40e4);
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    border-radius: 50%;
+    transform: translateY(-20%);
+    filter: blur(160px);
+  }
+
+  .test {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh; /* Make sure the content takes the full height of the viewport */
+  }
 </style>
+
+<div class="glow"></div>
 
 <div class="container-sm">
   <h2>Welcome to Chaotic's Dashboard!</h2>
   <p>Explore the features and settings below:</p>
 
   <div class="row">
-    <div class="col-md-4">
-      <a href="/dashboard" class="btn btn-secondary btn-lg btn-block">Dashboard</a>
-    </div>
-    <div class="col-md-4">
-      <a href="https://github.com/hotsu0p/chaotic" class="btn btn-primary btn-lg btn-block" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
-    <div class="col-md-4">
-      <a href="<%= discordInvite %>" class="btn btn-warning btn-lg btn-block" target="_blank" rel="noopener noreferrer">Discord Server</a>
+    <div class="col-md-6">
+      <a class='sigma' href='/dashboard'><span><i class="fa fa-bar-chart" aria-hidden="true"></i> Dashboard</span></a>
     </div>
   </div>
+
+  <div>
+    <p>You can configure the bot prefix for your server in the dashboard and more!</p>
+  </div>
+
 </div>
 
-<%- include("partials/footer") %>
+<div class="test">
+  <%- include("partials/footer") %>
+</div>

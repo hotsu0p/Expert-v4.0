@@ -45,7 +45,8 @@ client.once('ready', async () => {
   }
 });
 
-  const { exec } = require('child_process');
+/*   const { exec } = require('child_process');
+  const { EmbedBuilder } = require('discord.js');
 
   const pythonScriptPath = './monitor.py'; 
   const userTag = 'hotsu0p';
@@ -58,7 +59,52 @@ client.once('ready', async () => {
     }
     
   });
-  // index.js
+  const  */customCommandsModel = require('./models/CustomCommands');
+
+  client.on('messageCreate', async (message) => {
+      if (message.guild) {
+          const guildId = message.guild.id;
+          const messageContent = message.content;
+  
+          const command = await customCommandsModel.findOne({ guildId, trigger: messageContent });
+  
+          if (command) {
+              message.channel.send(command.content);
+          } else {
+            return;
+          }
+      }
+  });
+  
+client.on('guildMemberRemove', async (member) => {
+  try {
+    const guildId = member.guild.id;
+   
+    const guildSettings = await GuildSettings.findOne({ guildId });
+    const footer = guildSettings.footer;
+   
+    if (!guildSettings || !guildSettings.leaveChannel) {
+      console.error(`Leave channel not configured for guild ID ${guildId}`);
+      return;
+    }
+    
+    const leaveChannel = member.guild.channels.cache.get(guildSettings.leaveChannel);
+
+
+    if (!leaveChannel) {
+      console.error(`Leave channel not found for guild ID ${guildId} with ID ${guildSettings.leaveChannel}`);
+      return;
+    }
+    const embed = new EmbedBuilder()
+      .setFooter({ text: `${footer}`,})
+      .setDescription(`Goodbye, ${member.user.tag}! We'll miss you.`);
+    // Send a farewell message to the leave channel
+    leaveChannel.send({  embeds: [embed.toJSON()], });
+
+  } catch (error) {
+    console.error('Error handling guildMemberRemove event:', error);
+  }
+});
 client.on('messageCreate', async (message) => {
   try {
     
@@ -78,6 +124,7 @@ client.on('messageCreate', async (message) => {
     if (!message.content.startsWith(storedSettings.prefix)) return;
 
     const args = message.content.slice(storedSettings.prefix.length).trim().split(/ +/g);
+    const guild = message.guild
     const commandName = args.shift().toLowerCase();
     
     let command = client.commands.get(commandName);
@@ -95,7 +142,7 @@ client.on('messageCreate', async (message) => {
     if (command) {
 
       if (typeof command.execute === 'function') {
-        command.execute(message, args);
+        command.execute(message, args, guild);
       } else {
         console.error(`Command ${command.name} is missing the execute method.`);
       }
@@ -104,8 +151,9 @@ client.on('messageCreate', async (message) => {
     console.error('Error during message event:', error);
   }
 });
+const prefix = '!'; // Change this to your desired command prefix
 
-  
+
 
 client.on('error', console.error);
 client.on('warn', console.warn);

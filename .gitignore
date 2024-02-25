@@ -27,7 +27,7 @@ coverage
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
-
+.lh
 # Bower dependency directory (https://bower.io/)
 bower_components
 
@@ -102,6 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
-
+chaotic-github.code-workspace
 # Config file
 config.js
+package-lock.json

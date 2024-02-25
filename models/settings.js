@@ -9,6 +9,7 @@ const guildSettingSchema = new Schema({
     type: String,
     default: prefix,
   },
+  leaveChannel: { type: String, default: null }, // Add this field
+  footer: { type: String, default: "bye" }, // Add this field
 });
-
 module.exports = model("guild_settings", guildSettingSchema);
