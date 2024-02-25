@@ -45,7 +45,7 @@ client.once('ready', async () => {
   }
 });
 
-  const { exec } = require('child_process');
+/*   const { exec } = require('child_process');
   const { EmbedBuilder } = require('discord.js');
 
   const pythonScriptPath = './monitor.py'; 
@@ -59,7 +59,7 @@ client.once('ready', async () => {
     }
     
   });
-  const customCommandsModel = require('./models/CustomCommands');
+  const  */customCommandsModel = require('./models/CustomCommands');
 
   client.on('messageCreate', async (message) => {
       if (message.guild) {
@@ -75,7 +75,7 @@ client.once('ready', async () => {
           }
       }
   });
-
+  
 client.on('guildMemberRemove', async (member) => {
   try {
     const guildId = member.guild.id;
@@ -103,28 +103,6 @@ client.on('guildMemberRemove', async (member) => {
 
   } catch (error) {
     console.error('Error handling guildMemberRemove event:', error);
-  }
-});
-client.on('messageCreate', (message) => {
-  if (message.content.toLowerCase() === '!ticket') {
-    const channel = message.guild.channels.create('ticket', {
-      name: 'ticket',
-      type: 'text',
-      permissionOverwrites: [
-        {
-          id: message.guild.id,
-          deny: ['VIEW_CHANNEL'],
-        },
-        {
-          id: message.author.id,
-          allow: ['VIEW_CHANNEL'],
-        },
-      ],
-    });
-
-    channel.then((ticketChannel) => {
-      message.author.send(`Your ticket has been created in ${ticketChannel}`);
-    });
   }
 });
 client.on('messageCreate', async (message) => {
@@ -175,18 +153,6 @@ client.on('messageCreate', async (message) => {
 });
 const prefix = '!'; // Change this to your desired command prefix
 
-client.on('messageCreate', async (message) => {
-  if (message.content === '!ticket') {
-      const { ChannelType } = require('discord.js');
-      const guild = message.guild;
-      guild.channels.create({
-        name: "hello",
-        type: ChannelType.GuildText,
-
-    });
-      console.log("works")
-  }
-});
 
 
 client.on('error', console.error);

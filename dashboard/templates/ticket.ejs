@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Settings</title>
+  <!-- Add your CSS styles or include a stylesheet here -->
+</head>
+<body>
+
+  <h1>Ticket Settings</h1>
+
+  <% if (alert) { %>
+    <div class="alert">
+      <%= alert %>
+    </div>
+  <% } %>
+
+  <form action="/dashboard/<%= guild.id %>/update-ticket-settings" method="POST">
+    <label for="categoryId">Ticket Category:</label>
+    <input type="text" id="categoryId" name="categoryId" value="<%= ticketSettings ? ticketSettings.categoryId : '' %>">
+
+    <!-- Add additional form fields for other settings as needed -->
+
+    <button type="submit">Save</button>
+  </form>
+
+  <!-- Add additional HTML to display current settings or other information -->
+
+  <!-- Add your JavaScript logic or include a script here -->
+
+</body>
+</html>

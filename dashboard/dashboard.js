@@ -233,9 +233,8 @@ module.exports = async (client) => {
       res.redirect("/login"); // User is not authenticated, redirect to the login page
     }
   };
-  const TicketSettings = require('../models/TicketSettings');
 
-
+  
   app.get("/dashboard/:guildID/customcommads", isAuthenticated, async (req, res) => {
     try {
       const guildId = req.params.guildID;
@@ -243,7 +242,6 @@ module.exports = async (client) => {
         guildID: guildId,
         message: null ,
         guild: client.guilds.cache.get(guildId),
-        ticketSettings: storedTicketSettings,
         alert: null,
       });
     } catch (error) {
@@ -251,12 +249,62 @@ module.exports = async (client) => {
       res.status(500).send('Internal Server Error (ticket settings retrieval)');
     }
   });
-  app.get("/meow", async (req, res) => {
+  const TicketSettings = require('../models/ticketModel'); // Assuming you have a TicketSettings model
+
+  app.get('/dashboard/:guildID/ticket', async (req, res) => {
     try {
       const guildId = req.params.guildID;
       const storedTicketSettings = await TicketSettings.findOne({ guildId });
   
-      renderTemplate(res, req, "t.ejs", {
+      // Check if the guild exists
+      const guild = client.guilds.cache.get(guildId);
+      if (!guild) {
+        console.error(`Guild with ID ${guildId} not found.`);
+        return res.status(404).send('Guild not found');
+      }
+  
+      // Render the template with necessary data
+      renderTemplate(res, req, 'ticket', {
+        guild,
+        ticketSettings: storedTicketSettings,
+        alert: null,
+      });
+      console.log(storedTicketSettings);
+    } catch (error) {
+      console.error('Error retrieving ticket settings:', error);
+      res.status(500).send('Internal Server Error (ticket settings retrieval)');
+    }
+  });
+  
+
+app.post('/dashboard/:guildID/update-ticket-settings', async (req, res) => {
+  try {
+    const guildId = req.params.guildID;
+    const { categoryId, otherSettings } = req.body;
+
+    console.log('Guild ID:', guildId);
+    console.log('Other Settings:', categoryId);
+
+    // Update the ticket settings in the database (assuming TicketSettings model)
+    const storedTicketSettings = await TicketSettings.findOneAndUpdate(
+      { guildId },
+      { $set: { categoryId, otherSettings } },
+      { new: true, upsert: true }
+    );
+
+    res.status(200).send('Ticket settings updated successfully');
+  } catch (error) {
+    console.error('Error handling POST request:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+/*   app.get("/dashboard/:guildID/ticket", async (req, res) => {
+    try {
+      const guildId = req.params.guildID;
+      const storedTicketSettings = await TicketSettings.findOne({ guildId });
+  
+      renderTemplate(res, req, "ticket.ejs", {
         guild: client.guilds.cache.get(guildId),
         ticketSettings: storedTicketSettings,
         alert: null,
@@ -265,7 +313,7 @@ module.exports = async (client) => {
       console.error('Error retrieving ticket settings:', error);
       res.status(500).send('Internal Server Error (ticket settings retrieval)');
     }
-  });
+  }); */
   app.post('/submit-data', (req, res) => {
     const { name, email, message } = req.body; 
   
@@ -382,7 +430,7 @@ app.post('/dashboard/:guildID/set-footer', async (req, res) => {
       res.status(500).send('Internal Server Error');
     }
   });
-
+const custom_commandsModel = require('../models/CustomCommands');
 app.post('/dashboard/:guildID/update_command', async (req, res) => {
   try {
       const guildId = req.params.guildID;

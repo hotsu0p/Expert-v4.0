@@ -105,3 +105,4 @@ dist
 chaotic-github.code-workspace
 # Config file
 config.js
+package-lock.json

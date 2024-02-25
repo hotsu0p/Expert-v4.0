@@ -15,7 +15,12 @@
   "dependencies": {
     "@discordjs/builders": "^1.7.0",
     "@discordjs/collection": "^2.0.0",
+    "@ldspe/discord-tickets": "^1.0.0",
+    "aqify.js": "^2.5.0",
+    "discord_ticket_maker": "^1.3.2",
     "discord.js": "^14.10.2",
+    "discticket": "^1.0.14",
+    "djs-ticketsystem": "^2.1.1",
     "memorystore": "^1.6.7",
     "passport": "^0.7.0",
     "passport-discord": "^0.1.4"
