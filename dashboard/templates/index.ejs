@@ -4,6 +4,7 @@
   body {
     background: linear-gradient(to right, #1c1c1d, #0e131d);
     color: #ffffff;
+    font-family: "Arial", sans-serif;
   }
 
   .container-sm {
@@ -28,6 +29,8 @@
     margin: 1rem;
     border-radius: 1rem;
     transition: background-color 0.3s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
   }
 
   .btn-secondary {
@@ -62,26 +65,29 @@
     background-color: #d39e00;
     border-color: #d39e00;
   }
-  .button {
-  background-color: #323232;
-  border: none;
-  color: white;
-  padding: 13px 30px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  transition: .5s;
-  font-size: 13px;
-}
-.button:hover {
-  background-color: #363938;
-  color: #000000;
-  transform: translateY(2px);
-  transform: translateX(1px);
-}
-</style>
-<div class="glow"></div>
-<style>
+
+  .sigma {
+    background-color: #323232;
+    border: none;
+    color: white;
+    padding: 13px 30px;
+    text-align: center;
+    text-decoration: none;
+    margin-right: -585px;
+    align-self: center;
+    align-items: center;
+    display: inline-block;
+    transition: 0.5s;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .sigma:hover {
+    background-color: #363938;
+    color: #000000;
+    transform: translateY(2px);
+  }
+
   .glow {
     width: 80%;
     height: 60px;
@@ -94,24 +100,35 @@
     transform: translateY(-20%);
     filter: blur(160px);
   }
+
+  .test {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh; /* Make sure the content takes the full height of the viewport */
+  }
 </style>
+
+<div class="glow"></div>
+
 <div class="container-sm">
   <h2>Welcome to Chaotic's Dashboard!</h2>
   <p>Explore the features and settings below:</p>
 
   <div class="row">
-    <div class="col-md-4">
-      <a class='button btn btn-default' href='/dashboard'><span><i class="fa fa-bar-chart" aria-hidden="true"></i> Dashboard</span></a>
+    <div class="col-md-6">
+      <a class='sigma' href='/dashboard'><span><i class="fa fa-bar-chart" aria-hidden="true"></i> Dashboard</span></a>
     </div>
-    <div class="col-md-4">
   </div>
- 
-</div>
-<div>
+
   <div>
-      <div>
-        You can configure the bot prefix for your server in the dashboard! and more soon!
-      </div>
+    <p>You can configure the bot prefix for your server in the dashboard and more!</p>
   </div>
+
 </div>
-<%- include("partials/footer") %>
+
+<div class="test">
+  <%- include("partials/footer") %>
+</div>
